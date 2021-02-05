@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Toast, Card, Table } from '@innovaccer/design-system';
+import { Button, Toast, Card, Table, Heading, Column } from '@innovaccer/design-system';
 import { uploadData, getPatient } from "../api"
 
 const schema = [
@@ -31,17 +31,22 @@ export default class App extends Component {
             selectedFile: null,
             visible: false,
             message: "",
+            loading: true,
+            uploading : false
         }
     }
 
     componentDidMount() {
         this.getPatientData();
     }
-
     getPatientData(options) {
+        this.setState({
+            loading: true
+        })
         return getPatient(options)
             .then((result) => {
                 if (result.status === 200) {
+                    this.setState({ loading: false })
                     return result.data.patient_list
                 }
             })
@@ -55,18 +60,21 @@ export default class App extends Component {
     }
 
     onClickHandler = () => {
+        this.setState({
+            uploading:true
+        })
         uploadData(this.state.selectedFile)
             .then((result) => {
                 if (result.status === 200) {
                     this.setState({
                         visible: true,
+                        uploading : false,
                         message: result.data.message
                     })
                     setTimeout(() => {
                         this.setState({
-                            visible: false
+                            visible: false,
                         })
-                        this.getPatientData()
                     }, 5000)
                 }
             })
@@ -82,7 +90,22 @@ export default class App extends Component {
         this.props.history.push(`/patient/${data.id}`)
     }
 
+    errorTemplate(props) {
+        const { errorType = 'DEFAULT' } = props;
+        const errorMessages = {
+            'FAILED_TO_FETCH': 'Failed to fetch data',
+            'NO_RECORDS_FOUND': 'No results found',
+            'DEFAULT': 'No results found'
+        }
+        return (
+            <Column size={"12"} className="justify-content-center align-item-center d-flex p-10">
+                <Heading>{errorMessages[errorType]}</Heading>
+            </Column>
+        );
+    }
+
     render() {
+
         return (
             <div className="wrapper">
                 <div className="greeting-text">
@@ -99,7 +122,10 @@ export default class App extends Component {
                         <Toast appearance="success" title={this.state.message} onClose={this.handleClose} />
                     </div>
                 }
-                <Table loaderSchema={schema} type="resource" fetchData={this.getPatientData} pageSize={5} withHeader={true} headerOptions={{ withSearch: true }} onRowClick={(rowIndex) => this.handleRow(rowIndex)} />
+                {
+                    !this.state.uploading &&
+                    <Table loaderSchema={schema} type="resource" fetchData={this.getPatientData.bind(this)} pageSize={5} withHeader={true} headerOptions={{ withSearch: true }} onRowClick={(rowIndex) => this.handleRow(rowIndex)} errorTemplate={this.errorTemplate} loading={this.state.loading} />
+                }
             </div>
         )
     }
