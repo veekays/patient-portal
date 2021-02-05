@@ -1,17 +1,35 @@
+
 Clone the Project
-## `https://github.com/veekays/patient-portal.git`
+
+```bash
+ git clone https://github.com/veekays/patient-portal.git
+```
 
 Install dependency for Frontend
-### `cd frontend`
-### `npm install`
 
+```bash
+cd frontend
+npm install
+```
 
 Install dependency for Backend
-### `cd backend`
-### `npm install`
+
+```bash
+cd backend
+npm install
+```
 
 Run Frontend
-### `npm start`
+
+```bash
+npm start
+```
 
 Run Backend
-### `npm start`
+
+```bash
+npm start
+```
+
+> Note: frontend is running on localhost at port 3000, and api server is on port 5000.
+> Please upload a csv file to add data for the first time, a sample csv file is add in code, [sampleData.csv](sampleData.csv).
